@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Subscriptions{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">
+        <i class="bi bi-list-check me-2"></i>
+        Subscriptions
+    </h2>
+    <a href="{{ url_for('subscription.add_subscription') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-2"></i>
+        Add Subscription
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Restaurant Name</th>
+                        <th>Email</th>
+                        <th>Website URL</th>
+                        <th>Price</th>
+                        <th>Term</th>
+                        <th>Payment Method</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subscription in subscriptions %}
+                    <tr>
+                        <td>{{ subscription.restaurant_name }}</td>
+                        <td>{{ subscription.email }}</td>
+                        <td>
+                            <a href="{{ subscription.website_url }}" target="_blank" class="text-decoration-none">
+                                {{ subscription.website_url }}
+                                <i class="bi bi-box-arrow-up-right ms-1"></i>
+                            </a>
+                        </td>
+                        <td>${{ "%.2f"|format(subscription.subscription_price) }}</td>
+                        <td>{{ subscription.subscription_term }}</td>
+                        <td>{{ subscription.payment_method }}</td>
+                        <td>
+                            <span class="badge bg-{{ 'success' if subscription.status == 'active' else 'warning' if subscription.status == 'paused' else 'danger' }}">
+                                {{ subscription.status|title }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('subscription.view_subscription', id=subscription.id) }}" class="btn btn-sm btn-info">
+                                View
+                            </a>
+                            <div class="btn-group">
+                                <a href="{{ url_for('subscription.edit_subscription', id=subscription.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#deleteModal"
+                                        data-subscription-id="{{ subscription.id }}"
+                                        data-subscription-name="{{ subscription.restaurant_name }}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" data-bs-backdrop="static" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the subscription for <strong id="subscriptionName"></strong>?</p>
+                <p class="text-muted">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="POST">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-2"></i>
+                        Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteModal = document.getElementById('deleteModal');
+    if (deleteModal) {
+        deleteModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const subscriptionId = button.getAttribute('data-subscription-id');
+            const subscriptionName = button.getAttribute('data-subscription-name');
+            
+            const modalTitle = deleteModal.querySelector('.modal-title');
+            const subscriptionNameElement = deleteModal.querySelector('#subscriptionName');
+            const deleteForm = deleteModal.querySelector('#deleteForm');
+            
+            modalTitle.textContent = 'Confirm Deletion';
+            subscriptionNameElement.textContent = subscriptionName;
+            deleteForm.action = `/subscription/${subscriptionId}/delete`;
+        });
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

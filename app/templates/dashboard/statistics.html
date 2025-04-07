@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Statistics{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h2>Monthly Statistics</h2>
+    </div>
+    <div class="col-md-6 text-end">
+        <div class="btn-group">
+            <button class="btn btn-outline-primary" id="prevMonth">Previous Month</button>
+            <button class="btn btn-primary" id="currentMonth">Current Month</button>
+            <button class="btn btn-outline-primary" id="nextMonth">Next Month</button>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Total Revenue</h5>
+                <h2 class="card-text" id="totalRevenue">$0.00</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">New Subscriptions</h5>
+                <h2 class="card-text" id="newSubscriptions">0</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Active Subscriptions</h5>
+                <h2 class="card-text" id="totalActive">0</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Churn Rate</h5>
+                <h2 class="card-text" id="churnRate">0%</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Subscription Trends</h5>
+                <div class="chart-container" style="position: relative; height:300px;">
+                    <canvas id="subscriptionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Revenue Distribution</h5>
+                <div class="chart-container" style="position: relative; height:300px;">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentDate = new Date();
+let currentYear = currentDate.getFullYear();
+let currentMonth = currentDate.getMonth() + 1;
+let subscriptionChart = null;
+let revenueChart = null;
+
+function updateStatistics() {
+    fetch(`/api/statistics?year=${currentYear}&month=${currentMonth}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('totalRevenue').textContent = `$${data.total_revenue.toFixed(2)}`;
+            document.getElementById('newSubscriptions').textContent = data.new_subscriptions;
+            document.getElementById('totalActive').textContent = data.total_active;
+            document.getElementById('churnRate').textContent = `${data.churn_rate}%`;
+            
+            // Update charts
+            updateSubscriptionChart(data);
+            updateRevenueChart(data);
+        });
+}
+
+function updateSubscriptionChart(data) {
+    const ctx = document.getElementById('subscriptionChart').getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (subscriptionChart) {
+        subscriptionChart.destroy();
+    }
+    
+    subscriptionChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['New', 'Active', 'Churned'],
+            datasets: [{
+                label: 'Subscriptions',
+                data: [data.new_subscriptions, data.total_active, data.churn_rate],
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.1,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+function updateRevenueChart(data) {
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (revenueChart) {
+        revenueChart.destroy();
+    }
+    
+    revenueChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Revenue'],
+            datasets: [{
+                label: 'Total Revenue',
+                data: [data.total_revenue],
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgb(54, 162, 235)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// Event listeners for month navigation
+document.getElementById('prevMonth').addEventListener('click', () => {
+    if (currentMonth === 1) {
+        currentMonth = 12;
+        currentYear--;
+    } else {
+        currentMonth--;
+    }
+    updateStatistics();
+});
+
+document.getElementById('currentMonth').addEventListener('click', () => {
+    currentDate = new Date();
+    currentYear = currentDate.getFullYear();
+    currentMonth = currentDate.getMonth() + 1;
+    updateStatistics();
+});
+
+document.getElementById('nextMonth').addEventListener('click', () => {
+    if (currentMonth === 12) {
+        currentMonth = 1;
+        currentYear++;
+    } else {
+        currentMonth++;
+    }
+    updateStatistics();
+});
+
+// Initial load
+updateStatistics();
+</script>
+{% endblock %} 

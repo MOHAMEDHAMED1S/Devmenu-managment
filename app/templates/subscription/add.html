@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit' if subscription else 'Add' }} Subscription{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-{{ 'pencil' if subscription else 'plus-circle' }} me-2"></i>
+                    {{ 'Edit' if subscription else 'Add' }} Subscription
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('subscription.edit_subscription', id=subscription.id) if subscription else url_for('subscription.add_subscription') }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="restaurant_name" class="form-label">Restaurant Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-shop"></i>
+                                </span>
+                                {{ form.restaurant_name(class="form-control", placeholder="Enter restaurant name") }}
+                            </div>
+                            {% if form.restaurant_name.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.restaurant_name.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-envelope"></i>
+                                </span>
+                                {{ form.email(class="form-control", placeholder="Enter email address") }}
+                            </div>
+                            {% if form.email.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.email.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="website_url" class="form-label">Website URL</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-globe"></i>
+                                </span>
+                                {{ form.website_url(class="form-control", placeholder="Enter website URL") }}
+                            </div>
+                            {% if form.website_url.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.website_url.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="subscription_price" class="form-label">Subscription Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                {{ form.subscription_price(class="form-control", placeholder="0.00") }}
+                            </div>
+                            {% if form.subscription_price.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.subscription_price.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="subscription_term" class="form-label">Subscription Term</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-calendar"></i>
+                                </span>
+                                {{ form.subscription_term(class="form-select") }}
+                            </div>
+                            {% if form.subscription_term.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.subscription_term.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="payment_method" class="form-label">Payment Method</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-credit-card"></i>
+                                </span>
+                                {{ form.payment_method(class="form-select") }}
+                            </div>
+                            {% if form.payment_method.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.payment_method.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="website_username" class="form-label">Website Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-person"></i>
+                                </span>
+                                {{ form.website_username(class="form-control", placeholder="Enter website username") }}
+                            </div>
+                            {% if form.website_username.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.website_username.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="website_password" class="form-label">Website Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-key"></i>
+                                </span>
+                                {{ form.website_password(class="form-control", placeholder="Enter website password") }}
+                            </div>
+                            {% if form.website_password.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.website_password.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a href="{{ url_for('subscription.list_subscriptions') }}" class="btn btn-outline-secondary me-md-2">
+                            <i class="bi bi-arrow-left me-2"></i>
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save me-2"></i>
+                            {{ 'Update' if subscription else 'Save' }} Subscription
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
