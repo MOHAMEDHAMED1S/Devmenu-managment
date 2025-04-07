@@ -2,7 +2,7 @@
 
 A modern and elegant web application for managing restaurant subscriptions and payments. Built with Flask, PostgreSQL, and Bootstrap 5.
 
-![Subscription Manager](app/static/images/screenshot.png)
+![Subscription Manager](app/static/images/screenshot1.png)
 
 ## Features
 
