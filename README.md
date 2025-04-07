@@ -6,7 +6,7 @@ A modern and elegant web application for managing restaurant subscriptions and p
 
 ## Features
 
-### Subscription Management
+### Devmenu Subscription Management
 - **Add/Edit Subscriptions**
   - Restaurant details (name, email, website)
   - Subscription pricing and terms
@@ -86,7 +86,7 @@ A modern and elegant web application for managing restaurant subscriptions and p
 
 1. **Clone the repository**
 ```bash
-git clone <repository-url>
+git clone https://github.com/MOHAMEDHAMED1S/Devmenu-managment
 cd subscription-manager
 ```
 
